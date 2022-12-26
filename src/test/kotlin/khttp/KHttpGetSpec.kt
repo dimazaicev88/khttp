@@ -14,11 +14,7 @@ import java.net.MalformedURLException
 import java.net.SocketTimeoutException
 import java.util.zip.GZIPInputStream
 import java.util.zip.InflaterInputStream
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class KHttpGetSpec : Spek({
     describe("a get request") {

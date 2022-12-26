@@ -21,8 +21,7 @@ import java.io.StringWriter
 import java.net.IDN
 import java.net.URI
 import java.net.URL
-import java.net.URLDecoder
-import java.util.UUID
+import java.util.*
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLContext
 
@@ -144,18 +143,18 @@ class GenericRequest internal constructor(
             this.data = data
             if (data != null && this.files.isEmpty()) {
                 if (data is Map<*, *>) {
-                    mutableHeaders.putAllIfAbsentWithNull(GenericRequest.DEFAULT_FORM_HEADERS)
+                    mutableHeaders.putAllIfAbsentWithNull(DEFAULT_FORM_HEADERS)
                 } else {
-                    mutableHeaders.putAllIfAbsentWithNull(GenericRequest.DEFAULT_DATA_HEADERS)
+                    mutableHeaders.putAllIfAbsentWithNull(DEFAULT_DATA_HEADERS)
                 }
             }
         } else {
             this.data = this.coerceToJSON(json)
-            mutableHeaders.putAllIfAbsentWithNull(GenericRequest.DEFAULT_JSON_HEADERS)
+            mutableHeaders.putAllIfAbsentWithNull(DEFAULT_JSON_HEADERS)
         }
-        mutableHeaders.putAllIfAbsentWithNull(GenericRequest.DEFAULT_HEADERS)
+        mutableHeaders.putAllIfAbsentWithNull(DEFAULT_HEADERS)
         if (this.files.isNotEmpty()) {
-            mutableHeaders.putAllIfAbsentWithNull(GenericRequest.DEFAULT_UPLOAD_HEADERS)
+            mutableHeaders.putAllIfAbsentWithNull(DEFAULT_UPLOAD_HEADERS)
             if ("Content-Type" in mutableHeaders) {
                 mutableHeaders["Content-Type"] = mutableHeaders["Content-Type"]?.format(UUID.randomUUID().toString().replace("-", ""))
             }
@@ -170,24 +169,36 @@ class GenericRequest internal constructor(
     }
 
     private fun coerceToJSON(any: Any): String {
-        if (any is JSONObject || any is JSONArray) {
-            return any.toString()
-        } else if (any is Map<*, *>) {
-            return JSONObject(any.mapKeys { it.key.toString() }).toString()
-        } else if (any is Collection<*>) {
-            return JSONArray(any).toString()
-        } else if (any is Iterable<*>) {
-            return any.withJSONWriter { jsonWriter, _ ->
-                jsonWriter.array()
-                for (thing in any) {
-                    jsonWriter.value(thing)
-                }
-                jsonWriter.endArray()
+        when (any) {
+            is JSONObject, is JSONArray -> {
+                return any.toString()
             }
-        } else if (any is Array<*>) {
-            return JSONArray(any).toString()
-        } else {
-            throw IllegalArgumentException("Could not coerce ${any.javaClass.simpleName} to JSON.")
+
+            is Map<*, *> -> {
+                return JSONObject(any.mapKeys { it.key.toString() }).toString()
+            }
+
+            is Collection<*> -> {
+                return JSONArray(any).toString()
+            }
+
+            is Iterable<*> -> {
+                return any.withJSONWriter { jsonWriter, _ ->
+                    jsonWriter.array()
+                    for (thing in any) {
+                        jsonWriter.value(thing)
+                    }
+                    jsonWriter.endArray()
+                }
+            }
+
+            is Array<*> -> {
+                return JSONArray(any).toString()
+            }
+
+            else -> {
+                throw IllegalArgumentException("Could not coerce ${any.javaClass.simpleName} to JSON.")
+            }
         }
     }
 
@@ -199,15 +210,7 @@ class GenericRequest internal constructor(
     }
 
     private fun URL.toIDN(): URL {
-        val newHost = IDN.toASCII(this.host)
-        this.javaClass.getDeclaredField("host").apply { this.isAccessible = true }.set(this, newHost)
-        this.javaClass.getDeclaredField("authority").apply { this.isAccessible = true }.set(this, if (this.port == -1) this.host else "${this.host}:${this.port}")
-        val query = if (this.query == null) {
-            null
-        } else {
-            URLDecoder.decode(this.query, "UTF-8")
-        }
-        return URL(URI(this.protocol, this.userInfo, this.host, this.port, this.path, query, this.ref).toASCIIString())
+        return URL(URL(this.protocol,IDN.toASCII(this.host),this.file).toURI().toASCIIString())
     }
 
     private fun makeRoute(route: String) = URL(route + if (this.params.isNotEmpty()) "?${Parameters(this.params)}" else "").toIDN().toString()

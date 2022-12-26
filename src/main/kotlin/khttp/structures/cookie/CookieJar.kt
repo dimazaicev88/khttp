@@ -5,13 +5,11 @@
  */
 package khttp.structures.cookie
 
-import java.util.HashMap
-
-class CookieJar(vararg val cookies: Cookie = arrayOf()) : MutableMap<String, String> by (cookies.associate { it.key to it.valueWithAttributes } as HashMap<String, String>) {
+class CookieJar(private vararg val cookies: Cookie = arrayOf()) : MutableMap<String, String> by (cookies.associate { it.key to it.valueWithAttributes } as HashMap<String, String>) {
 
     companion object {
         private fun Map<String, Any>.toCookieArray(): Array<Cookie> {
-            return this.map {
+            return this.map { it ->
                 val valueList = it.value.toString().split(";").map(String::trim)
                 val value = valueList[0]
                 val attributes = if (valueList.size < 2) mapOf<String, String>() else {

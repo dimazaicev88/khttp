@@ -18,11 +18,7 @@ import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
 import java.util.zip.GZIPInputStream
 import java.util.zip.InflaterInputStream
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class KHttpAsyncGetSpec : Spek({
     describe("an async get request") {
@@ -386,7 +382,7 @@ class KHttpAsyncGetSpec : Spek({
         var response: Response? = null
 
         async.get("https://httpbin.org/gzip", onError = { error = this }, onResponse = { response = this })
-        await.atMost(5, TimeUnit.SECONDS)
+        await.atMost(45, TimeUnit.SECONDS)
                 .until { response != null }
 
         context("accessing the stream") {

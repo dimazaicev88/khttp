@@ -10,7 +10,6 @@ import org.spekframework.spek2.style.specification.describe
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 class CaseInsensitiveMapSpec : Spek({
     describe("a case-insensitive map initialized with a backing map") {
@@ -27,7 +26,7 @@ class CaseInsensitiveMapSpec : Spek({
                 assertEquals(backed, upper)
             }
             it("should have an equal upper and lower value") {
-                assertTrue(upper == lower)
+                assertEquals(upper, lower)
             }
         }
         context("checking if a mapping is present") {
@@ -41,7 +40,7 @@ class CaseInsensitiveMapSpec : Spek({
                 assertEquals(backed, upper)
             }
             it("should have an equal upper and lower value") {
-                assertTrue(upper == lower)
+                assertEquals(upper, lower)
             }
         }
         context("toString") {
@@ -59,10 +58,10 @@ class CaseInsensitiveMapSpec : Spek({
                 assertFalse(caseInsensitiveMap.containsKey(object {} as Any))
             }
             it("should be null") {
-                assertNull(caseInsensitiveMap.get(null as String?))
+                assertNull(caseInsensitiveMap[null as String?])
             }
             it("should be null") {
-                assertNull(caseInsensitiveMap.get(object {} as Any))
+                assertNull(caseInsensitiveMap[object {} as Any])
             }
             it("should be false") {
                 assertFalse(caseInsensitiveMap.containsKey("b"))

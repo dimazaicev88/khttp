@@ -7,11 +7,7 @@ package khttp.structures.cookie
 
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class CookieJarSpec : Spek({
     describe("a CookieJar constructed with Cookies") {
@@ -79,7 +75,7 @@ class CookieJarSpec : Spek({
         }
         context("accessing a cookie that doesn't exist") {
             val cookie = cookieJar.getCookie("test3")
-            val cookieRaw: Any? = cookieJar.get(null as String?)
+            val cookieRaw: Any? = cookieJar[null as String?]
             it("should be null") {
                 assertNull(cookie)
             }
@@ -201,7 +197,7 @@ class CookieJarSpec : Spek({
             val removed: Any? = (cookieJar as MutableMap<*, *>).remove(null)
             val size = cookieJar.size
             it("should be the same size") {
-                assertTrue(originalSize == size)
+                assertEquals(originalSize, size)
             }
             it("should not have removed anything") {
                 assertNull(removed)
