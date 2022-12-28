@@ -210,7 +210,7 @@ class GenericRequest internal constructor(
     }
 
     private fun URL.toIDN(): URL {
-        return URL(URL(this.protocol,IDN.toASCII(this.host),this.file).toURI().toASCIIString())
+        return URL(URL(this.protocol, IDN.toASCII(this.host), this.port, this.file).toURI().toASCIIString())
     }
 
     private fun makeRoute(route: String) = URL(route + if (this.params.isNotEmpty()) "?${Parameters(this.params)}" else "").toIDN().toString()
